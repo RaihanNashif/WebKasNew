@@ -1,0 +1,41 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) session_start();
+require '../backend/config/koneksi.php';
+if (isset($_SESSION['id_user'])) {
+    header("Location: ./".$_SESSION['role']."/dashboard.html");
+    exit;
+}
+$error='';
+if ($_SERVER['REQUEST_METHOD']==='POST') {
+    $u = mysqli_real_escape_string($conn, $_POST['username']);
+    $p = $_POST['password'];
+    $q = mysqli_query($conn,"SELECT * FROM users WHERE username='$u' LIMIT 1");
+    if (mysqli_num_rows($q)==1) {
+        $row = mysqli_fetch_assoc($q);
+        // check plain or hash
+        if ($p === $row['password'] || password_verify($p,$row['password'])) {
+            $_SESSION['id_user']=$row['id_user'];
+            $_SESSION['nama']=$row['nama'];
+            $_SESSION['role']=$row['role'];
+            header("Location: ./".$row['role']."/dashboard.html");
+            exit;
+        }
+    }
+    $error='Username / Password salah';
+}
+include 'navbar.php';
+?>
+<div class="container">
+  <div class="main-card" style="max-width:480px;margin:20px auto">
+    <h2 class="center">Login Sistem Kas</h2>
+    <?php if($error) echo "<div class='small' style='color:red;margin-bottom:8px'>$error</div>"; ?>
+    <form method="POST" action="index.html">
+      <label>Username</label>
+      <input type="text" name="username" required>
+      <label>Password</label>
+      <input type="password" name="password" required>
+      <button class="btn btn-primary" type="submit" style="width:100%;margin-top:12px">Login</button>
+    </form>
+  </div>
+</div>
+<footer class="container"><small>© Sistem Kas Desa</small></footer>

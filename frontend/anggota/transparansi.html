@@ -1,0 +1,43 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) session_start();
+require '../../backend/config/koneksi.php';
+include '../navbar.php';
+?>
+<div class="container">
+  <h2>Transparansi Dana</h2>
+  <div class="main-card">
+    <?php
+      $in = mysqli_fetch_assoc(mysqli_query($conn,"SELECT SUM(jumlah) AS t FROM pemasukan"))['t'] ?? 0;
+      $out = mysqli_fetch_assoc(mysqli_query($conn,"SELECT SUM(jumlah) AS t FROM pengeluaran"))['t'] ?? 0;
+      $saldo = $in - $out;
+    ?>
+    <div class="row">
+      <div class="col card"><h3>Rp <?=number_format($in,0,',','.')?></h3><p>Total Pemasukan</p></div>
+      <div class="col card"><h3>Rp <?=number_format($out,0,',','.')?></h3><p>Total Pengeluaran</p></div>
+      <div class="col card"><h3>Rp <?=number_format($saldo,0,',','.')?></h3><p>Saldo Akhir</p></div>
+    </div>
+
+    <h3 style="margin-top:12px">Daftar Pemasukan</h3>
+    <table class="table">
+      <thead><tr><th>Tanggal</th><th>Sumber</th><th>Jumlah</th><th>Oleh</th></tr></thead>
+      <tbody>
+      <?php
+        $pq=mysqli_query($conn,"SELECT p.*,u.nama FROM pemasukan p LEFT JOIN users u ON p.id_user=u.id_user ORDER BY p.tanggal DESC");
+        while($r=mysqli_fetch_assoc($pq)) echo "<tr><td>{$r['tanggal']}</td><td>".htmlentities($r['sumber'])."</td><td>Rp ".number_format($r['jumlah'],0,',','.')."</td><td>".htmlentities($r['nama'])."</td></tr>";
+      ?>
+      </tbody>
+    </table>
+
+    <h3 style="margin-top:12px">Daftar Pengeluaran</h3>
+    <table class="table">
+      <thead><tr><th>Tanggal</th><th>Keperluan</th><th>Jumlah</th><th>Oleh</th></tr></thead>
+      <tbody>
+      <?php
+        $pq=mysqli_query($conn,"SELECT p.*,u.nama FROM pengeluaran p LEFT JOIN users u ON p.id_user=u.id_user ORDER BY p.tanggal DESC");
+        while($r=mysqli_fetch_assoc($pq)) echo "<tr><td>{$r['tanggal']}</td><td>".htmlentities($r['keperluan'])."</td><td>Rp ".number_format($r['jumlah'],0,',','.')."</td><td>".htmlentities($r['nama'])."</td></tr>";
+      ?>
+      </tbody>
+    </table>
+  </div>
+</div>
+<footer class="container"><small>© Sistem Kas Desa</small></footer>
