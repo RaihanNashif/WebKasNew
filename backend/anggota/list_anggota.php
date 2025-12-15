@@ -45,8 +45,8 @@ $query = mysqli_query($conn, "
                 <td><?= htmlentities($row['alamat']); ?></td>
                 <td><?= htmlentities($row['no_hp']); ?></td>
                 <td>
-                    <a href="edit_anggota.php?id=<?= $row['id_user']; ?>" class="btn btn-warning btn-sm">Edit</a>
-                    <a href="hapus_anggota.php?id=<?= $row['id_user']; ?>"
+                    <a href="edit_anggota.php?id=<?= $row['id_users']; ?>" class="btn btn-warning btn-sm">Edit</a>
+                    <a href="hapus_anggota.php?id=<?= $row['id_users']; ?>"
                        onclick="return confirm('Yakin ingin menghapus anggota ini?')"
                        class="btn btn-danger btn-sm">Hapus</a>
                 </td>

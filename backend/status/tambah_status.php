@@ -5,13 +5,13 @@ require "../config/koneksi.php";
 
 if (isset($_POST['simpan'])) {
 
-    $id_user = $_POST['id_user'];
+    $id_user = $_POST['id_users'];
     $bulan   = $_POST['bulan'];
     $tahun   = $_POST['tahun'];
     $jumlah  = $_POST['jumlah'];
 
     $insert = mysqli_query($conn, "
-        INSERT INTO status_pembayaran (id_user, bulan, tahun, jumlah, status, tanggal_bayar)
+        INSERT INTO status_pembayaran (id_users, bulan, tahun, jumlah, status, tanggal_bayar)
         VALUES ($id_user, '$bulan', '$tahun', $jumlah, 'LUNAS', NOW())
     ");
 
@@ -27,12 +27,12 @@ if (isset($_POST['simpan'])) {
 
 <form method="POST">
     <label>Pilih Anggota</label>
-    <select name="id_user" required>
+    <select name="id_users" required>
         <option value="">-- pilih --</option>
         <?php
         $anggota = mysqli_query($conn, "SELECT * FROM users WHERE role='anggota'");
         while ($a = mysqli_fetch_assoc($anggota)) {
-            echo "<option value='{$a['id_user']}'>{$a['nama']}</option>";
+            echo "<option value='{$a['id_users']}'>{$a['nama']}</option>";
         }
         ?>
     </select>

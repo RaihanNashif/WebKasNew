@@ -4,7 +4,7 @@ include "../partials/navbar.php";
 require "../config/koneksi.php";
 
 $id = $_GET['id'];
-$data = mysqli_query($conn, "SELECT * FROM users WHERE id_user='$id'");
+$data = mysqli_query($conn, "SELECT * FROM users WHERE id_users='$id'");
 $user = mysqli_fetch_assoc($data);
 
 if (!$user) {

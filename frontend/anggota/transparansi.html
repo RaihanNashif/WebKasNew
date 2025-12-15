@@ -1,43 +1,89 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) session_start();
-require '../../backend/config/koneksi.php';
-include '../navbar.php';
+session_start();
+require "../config/koneksi.php";
+include "../partials/navbar.php";
 ?>
-<div class="container">
-  <h2>Transparansi Dana</h2>
-  <div class="main-card">
-    <?php
-      $in = mysqli_fetch_assoc(mysqli_query($conn,"SELECT SUM(jumlah) AS t FROM pemasukan"))['t'] ?? 0;
-      $out = mysqli_fetch_assoc(mysqli_query($conn,"SELECT SUM(jumlah) AS t FROM pengeluaran"))['t'] ?? 0;
-      $saldo = $in - $out;
-    ?>
-    <div class="row">
-      <div class="col card"><h3>Rp <?=number_format($in,0,',','.')?></h3><p>Total Pemasukan</p></div>
-      <div class="col card"><h3>Rp <?=number_format($out,0,',','.')?></h3><p>Total Pengeluaran</p></div>
-      <div class="col card"><h3>Rp <?=number_format($saldo,0,',','.')?></h3><p>Saldo Akhir</p></div>
+
+<div class="container py-5">
+    <h2 class="mb-4">Transparansi Kas</h2>
+
+    <h4 class="mt-4">Pemasukan</h4>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark text-center">
+                <tr>
+                    <th>No</th>
+                    <th>Nama Anggota</th>
+                    <th>Sumber</th>
+                    <th>Keterangan</th>
+                    <th>Jumlah</th>
+                    <th>Tanggal</th>
+                    <th>Diinput Oleh</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php
+            $q = mysqli_query($conn, "
+                SELECT p.*, u.nama AS anggota, a.nama AS input_admin
+                FROM pemasukan p
+                LEFT JOIN users u ON p.id_users = u.id_users
+                LEFT JOIN users a ON p.input_by = a.id_users
+                ORDER BY p.tanggal DESC
+            ");
+            $no = 1;
+            while ($r = mysqli_fetch_assoc($q)):
+            ?>
+                <tr class="text-center">
+                    <td><?= $no++; ?></td>
+                    <td><?= htmlentities($r['anggota']) ?></td>
+                    <td><?= htmlentities($r['sumber']) ?></td>
+                    <td><?= htmlentities($r['keterangan']) ?></td>
+                    <td>Rp <?= number_format($r['jumlah'], 0, ',', '.') ?></td>
+                    <td><?= $r['tanggal'] ?></td>
+                    <td><?= htmlentities($r['input_admin']) ?></td>
+                </tr>
+            <?php endwhile; ?>
+            </tbody>
+        </table>
     </div>
 
-    <h3 style="margin-top:12px">Daftar Pemasukan</h3>
-    <table class="table">
-      <thead><tr><th>Tanggal</th><th>Sumber</th><th>Jumlah</th><th>Oleh</th></tr></thead>
-      <tbody>
-      <?php
-        $pq=mysqli_query($conn,"SELECT p.*,u.nama FROM pemasukan p LEFT JOIN users u ON p.id_user=u.id_user ORDER BY p.tanggal DESC");
-        while($r=mysqli_fetch_assoc($pq)) echo "<tr><td>{$r['tanggal']}</td><td>".htmlentities($r['sumber'])."</td><td>Rp ".number_format($r['jumlah'],0,',','.')."</td><td>".htmlentities($r['nama'])."</td></tr>";
-      ?>
-      </tbody>
-    </table>
-
-    <h3 style="margin-top:12px">Daftar Pengeluaran</h3>
-    <table class="table">
-      <thead><tr><th>Tanggal</th><th>Keperluan</th><th>Jumlah</th><th>Oleh</th></tr></thead>
-      <tbody>
-      <?php
-        $pq=mysqli_query($conn,"SELECT p.*,u.nama FROM pengeluaran p LEFT JOIN users u ON p.id_user=u.id_user ORDER BY p.tanggal DESC");
-        while($r=mysqli_fetch_assoc($pq)) echo "<tr><td>{$r['tanggal']}</td><td>".htmlentities($r['keperluan'])."</td><td>Rp ".number_format($r['jumlah'],0,',','.')."</td><td>".htmlentities($r['nama'])."</td></tr>";
-      ?>
-      </tbody>
-    </table>
-  </div>
+    <h4 class="mt-5">Pengeluaran</h4>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark text-center">
+                <tr>
+                    <th>No</th>
+                    <th>Nama Anggota</th>
+                    <th>Keperluan</th>
+                    <th>Keterangan</th>
+                    <th>Jumlah</th>
+                    <th>Tanggal</th>
+                    <th>Diinput Oleh</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php
+            $q2 = mysqli_query($conn, "
+                SELECT p.*, u.nama AS anggota, a.nama AS input_admin
+                FROM pengeluaran p
+                LEFT JOIN users u ON p.id_users = u.id_users
+                LEFT JOIN users a ON p.input_by = a.id_users
+                ORDER BY p.tanggal DESC
+            ");
+            $no2 = 1;
+            while ($r2 = mysqli_fetch_assoc($q2)):
+            ?>
+                <tr class="text-center">
+                    <td><?= $no2++; ?></td>
+                    <td><?= htmlentities($r2['anggota']) ?></td>
+                    <td><?= htmlentities($r2['keperluan']) ?></td>
+                    <td><?= htmlentities($r2['keterangan']) ?></td>
+                    <td>Rp <?= number_format($r2['jumlah'], 0, ',', '.') ?></td>
+                    <td><?= $r2['tanggal'] ?></td>
+                    <td><?= htmlentities($r2['input_admin']) ?></td>
+                </tr>
+            <?php endwhile; ?>
+            </tbody>
+        </table>
+    </div>
 </div>
-<footer class="container"><small>© Sistem Kas Desa</small></footer>

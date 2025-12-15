@@ -40,7 +40,7 @@ if (isset($_GET['bulan']) && isset($_GET['tahun'])) {
     $query = mysqli_query($conn, "
         SELECT sp.*, u.nama 
         FROM status_pembayaran sp
-        JOIN users u ON sp.id_user = u.id_user
+        JOIN users u ON sp.id_users = u.id_users
         WHERE sp.bulan = '$bulan' AND sp.tahun = '$tahun'
         ORDER BY u.nama ASC
     ");
@@ -61,7 +61,11 @@ if (isset($_GET['bulan']) && isset($_GET['tahun'])) {
             <td>Rp <?= number_format($d['jumlah'], 0, ',', '.') ?></td>
             <td><?= $d['tanggal_bayar']; ?></td>
             <td>
-                <a href="hapus_status.php?id=<?= $d['id_status']; ?>" onclick="return confirm('Hapus data?')">Hapus</a>
+                <a href="hapus_status.php?id=<?= $d['id_status']; ?>" 
+                    class="btn btn-danger btn-sm"
+                    onclick="return confirm('Hapus data?')">
+                    Hapus
+                </a>
             </td>
         </tr>
     <?php } ?>

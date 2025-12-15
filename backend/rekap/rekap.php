@@ -28,9 +28,9 @@ require "../config/koneksi.php";
     
     <button type="submit">Lihat</button>
 
-    <?php if (isset($_GET['bulan'])): ?>
+    <?php if (isset($_GET['bulan']) && isset($_GET['tahun'])): ?>
         <a href="export_pdf.php?bulan=<?= $_GET['bulan']; ?>&tahun=<?= $_GET['tahun']; ?>" 
-           target="_blank" 
+           target="_blank"
            style="margin-left:20px; padding:8px; background:green; color:white; text-decoration:none;">
            Export PDF
         </a>
@@ -45,37 +45,53 @@ if (isset($_GET['bulan']) && isset($_GET['tahun'])) {
     $bulan = $_GET['bulan'];
     $tahun = $_GET['tahun'];
 
+    // Ambil semua anggota
     $anggota = mysqli_query($conn, "
-        SELECT id_user, nama 
+        SELECT id_users, nama 
         FROM users 
         WHERE role='anggota'
         ORDER BY nama ASC
-    ");
+    ") or die("Query anggota gagal: " . mysqli_error($conn));
 ?>
 <table border="1" cellpadding="10" cellspacing="0">
     <tr>
         <th>Nama Anggota</th>
         <th>Status</th>
+        <th>Jumlah</th>
+        <th>Tanggal Bayar</th>
     </tr>
 
     <?php while ($a = mysqli_fetch_assoc($anggota)) { 
 
+        // Ambil status pembayaran asli
         $cek = mysqli_query($conn, "
-            SELECT 1 FROM status_pembayaran 
-            WHERE id_user='{$a['id_user']}'
+            SELECT status, jumlah, tanggal_bayar 
+            FROM status_pembayaran 
+            WHERE id_users='{$a['id_users']}'
             AND bulan='$bulan'
             AND tahun='$tahun'
             LIMIT 1
-        ");
+        ") or die("Query status gagal: " . mysqli_error($conn));
 
-        $status = (mysqli_num_rows($cek) > 0)
-            ? "<span style='color:green;font-weight:bold;'>LUNAS</span>"
-            : "<span style='color:red;font-weight:bold;'>BELUM</span>";
+        if(mysqli_num_rows($cek) > 0){
+            $row = mysqli_fetch_assoc($cek);
+            $status = ($row['status'] === 'lunas') 
+                ? "<span style='color:green;font-weight:bold;'>LUNAS</span>"
+                : "<span style='color:red;font-weight:bold;'>BELUM</span>";
+            $jumlah = "Rp " . number_format($row['jumlah'], 0, ',', '.');
+            $tanggal = $row['tanggal_bayar'];
+        } else {
+            $status = "<span style='color:red;font-weight:bold;'>BELUM</span>";
+            $jumlah = "Rp 0";
+            $tanggal = "-";
+        }
     ?>
 
     <tr>
         <td><?= $a['nama'] ?></td>
         <td><?= $status ?></td>
+        <td><?= $jumlah ?></td>
+        <td><?= $tanggal ?></td>
     </tr>
 
     <?php } ?>

@@ -1,10 +1,12 @@
 <?php 
 include "../middleware/anggota_only.php";
 include "../partials/navbar.php";
+include "../status/generate_status.php";
 require "../config/koneksi.php";
 
 // Ambil status pembayaran user ini
-$idUser = $_SESSION['id_user'];
+
+$idUser = $_SESSION['id_users'] ?? null;;
 $q = mysqli_query($conn,
     "SELECT bulan, tahun FROM status_pembayaran WHERE id_users='$idUser'"
 );
@@ -14,6 +16,8 @@ $q = mysqli_query($conn,
 <div class="container">
     <h2>Dashboard Anggota</h2>
     <p>Halo <?= $_SESSION['nama']; ?>! Berikut status pembayaran kamu:</p>
+    <a href="../laporan/laporan_anggota.php" class="btn btn-primary">Lihat Laporan Saya</a>
+
 
     <table border="1" cellpadding="10">
         <tr>

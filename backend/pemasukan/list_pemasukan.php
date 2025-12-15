@@ -6,7 +6,7 @@ require "../config/koneksi.php";
 $query = mysqli_query($conn, "
     SELECT p.*, u.nama 
     FROM pemasukan p 
-    LEFT JOIN users u ON p.id_user = u.id_user
+    LEFT JOIN users u ON p.id_users = u.id_users
     ORDER BY p.tanggal DESC
 ");
 ?>
@@ -34,6 +34,7 @@ $query = mysqli_query($conn, "
                 <th>Nama Anggota</th>
                 <th>Sumber</th>
                 <th>Jumlah</th>
+                <th>Keterangan</th>
                 <th>Tanggal</th>
                 <th>Aksi</th>
             </tr>
@@ -46,15 +47,16 @@ $query = mysqli_query($conn, "
                 <td><?= htmlentities($row['nama']); ?></td>
                 <td><?= htmlentities($row['sumber']); ?></td>
                 <td>Rp <?= number_format($row['jumlah'], 0, ',', '.'); ?></td>
+                <td><?= htmlentities($row['keterangan']); ?></td>
                 <td><?= $row['tanggal']; ?></td>
 
                 <td>
-                    <a href="edit_pemasukan.php?id=<?= $row['id']; ?>" 
+                    <a href="edit_pemasukan.php?id=<?= $row['id_pemasukan']; ?>" 
                        class="btn btn-warning btn-sm">
                         Edit
                     </a>
 
-                    <a href="hapus_pemasukan.php?id=<?= $row['id']; ?>"
+                    <a href="hapus_pemasukan.php?id=<?= $row['id_pemasukan']; ?>"
                        onclick="return confirm('Yakin ingin menghapus data ini?')"
                        class="btn btn-danger btn-sm">
                         Hapus

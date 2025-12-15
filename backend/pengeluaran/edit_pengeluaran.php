@@ -1,74 +1,80 @@
 <?php
-include "../middleware/admin_superadmin.php";
-include "../partials/navbar.php";
+session_start();
 require "../config/koneksi.php";
+include "../partials/navbar.php";
 
-// Ambil ID
 $id = $_GET['id'];
+$id_input = $_SESSION['id_users'];
 
-$data = mysqli_query($conn, "SELECT * FROM pengeluaran WHERE id='$id'");
-$row = mysqli_fetch_assoc($data);
+$p = mysqli_query($conn, "SELECT * FROM pengeluaran WHERE id_pengeluaran='$id'");
+$data = mysqli_fetch_assoc($p);
 
-if (!$row) {
-    die("Data pengeluaran tidak ditemukan.");
-}
+// list anggota
+$anggota = mysqli_query($conn, "SELECT id_users, nama FROM users WHERE role='anggota' ORDER BY nama ASC");
 
-if (isset($_POST['update'])) {
+if (isset($_POST['simpan'])) {
+    $id_user = $_POST['id_user'];
+    $keperluan = $_POST['keperluan'];
+    $keterangan = $_POST['keterangan'];
+    $jumlah = $_POST['jumlah'];
+    $tanggal = $_POST['tanggal'];
 
-    $keperluan = mysqli_real_escape_string($conn, $_POST['keperluan']);
-    $tanggal   = $_POST['tanggal'];
-    $jumlah    = $_POST['jumlah'];
-
-    mysqli_query($conn, "
-        UPDATE pengeluaran SET
+    $update = mysqli_query($conn, "
+        UPDATE pengeluaran 
+        SET id_users='$id_user',
             keperluan='$keperluan',
+            keterangan='$keterangan',
+            jumlah='$jumlah',
             tanggal='$tanggal',
-            jumlah='$jumlah'
-        WHERE id='$id'
+            input_by='$id_input'
+        WHERE id_pengeluaran='$id'
     ");
 
-    header("Location: list_pengeluaran.php");
-    exit;
+    if ($update) {
+        header("Location: list_pengeluaran.php");
+        exit;
+    } else {
+        die("Error: " . mysqli_error($conn));
+    }
 }
 ?>
-<!DOCTYPE html>
-<html lang="id">
 
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Pengeluaran</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-</head>
-
-<body class="bg-light">
 <div class="container py-4">
+    <h2>Edit Pengeluaran</h2>
 
-    <h3 class="mb-3">Edit Pengeluaran</h3>
-
-    <form method="POST" class="bg-white p-4 rounded shadow-sm">
-
+    <form method="POST">
         <div class="mb-3">
-            <label class="form-label">Keperluan</label>
-            <input name="keperluan" class="form-control" 
-                   value="<?= htmlentities($row['keperluan']); ?>" required>
+            <label>Nama Anggota</label>
+            <select name="id_user" class="form-select" required>
+                <?php while ($row = mysqli_fetch_assoc($anggota)): ?>
+                    <option value="<?= $row['id_users']; ?>"
+                        <?= $row['id_users'] == $data['id_users'] ? 'selected' : '' ?>>
+                        <?= htmlentities($row['nama']); ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Tanggal</label>
-            <input type="date" name="tanggal" class="form-control"
-                   value="<?= $row['tanggal']; ?>" required>
+            <label>Keperluan</label>
+            <input type="text" name="keperluan" class="form-control" value="<?= htmlentities($data['keperluan']); ?>" required>
         </div>
 
         <div class="mb-3">
-            <label class="form-label">Jumlah</label>
-            <input type="number" name="jumlah" class="form-control"
-                   value="<?= $row['jumlah']; ?>" required>
+            <label>Keterangan</label>
+            <textarea name="keterangan" class="form-control"><?= htmlentities($data['keterangan']); ?></textarea>
         </div>
 
-        <button class="btn btn-primary" name="update">Update</button>
+        <div class="mb-3">
+            <label>Jumlah</label>
+            <input type="number" name="jumlah" class="form-control" value="<?= $data['jumlah']; ?>" required>
+        </div>
 
+        <div class="mb-3">
+            <label>Tanggal</label>
+            <input type="date" name="tanggal" class="form-control" value="<?= $data['tanggal']; ?>" required>
+        </div>
+
+        <button type="submit" name="simpan" class="btn btn-primary">Update</button>
     </form>
-
 </div>
-</body>
-</html>

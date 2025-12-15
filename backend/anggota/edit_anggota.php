@@ -5,7 +5,7 @@ require "../config/koneksi.php";
 
 $id = $_GET['id'];
 
-$data = mysqli_query($conn, "SELECT * FROM users WHERE id_user='$id'");
+$data = mysqli_query($conn, "SELECT * FROM users WHERE id_users='$id'");
 $anggota = mysqli_fetch_assoc($data);
 
 if (!$anggota) {
@@ -34,7 +34,7 @@ if (isset($_POST['update'])) {
         alamat='$alamat',
         no_hp='$no_hp'
         $passQuery
-        WHERE id_user='$id'
+        WHERE id_users='$id'
     ");
 
     header("Location: list_anggota.php");

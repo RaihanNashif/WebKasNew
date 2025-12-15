@@ -1,5 +1,5 @@
 <?php
-include "../middleware/login_required.php"; 
+include "../middleware/anggota_only.php"; 
 include "../partials/navbar.php";
 require "../config/koneksi.php";
 ?>

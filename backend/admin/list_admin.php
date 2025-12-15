@@ -46,14 +46,14 @@ $query = mysqli_query($conn, "
                 <td><?= $no++; ?></td>
                 <td><?= htmlentities($row['nama']); ?></td>
                 <td><?= htmlentities($row['username']); ?></td>
-                <td><?= $row['role']; ?></td>
+                <td><?= htmlentities($row['role']); ?></td>
                 <td><?= htmlentities($row['no_hp']); ?></td>
                 <td>
-                    <a href="edit_admin.php?id=<?= $row['id_user']; ?>" class="btn btn-warning btn-sm">
+                    <a href="edit_admin.php?id=<?= $row['id_users']; ?>" class="btn btn-warning btn-sm">
                         Edit
                     </a>
                     <?php if ($row['role'] == 'admin'): ?>
-                        <a href="hapus_admin.php?id=<?= $row['id_user']; ?>" 
+                        <a href="hapus_admin.php?id=<?= $row['id_users']; ?>" 
                            onclick="return confirm('Yakin ingin menghapus admin ini?')" 
                            class="btn btn-danger btn-sm">
                             Hapus

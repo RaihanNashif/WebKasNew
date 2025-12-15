@@ -1,17 +1,30 @@
 <?php 
-include "../middleware/anggota_only.php";
-include "../partials/navbar.php";
 require "../config/koneksi.php";
 
-$id_user = $_SESSION['id_user'];
+include "../middleware/anggota_only.php";
+include "../partials/navbar.php";
 
+// Ambil ID user dari session
+$id_user = $_SESSION['id_users'];
+
+// Query ambil status pembayaran
 $cek = mysqli_query($conn, "
-    SELECT * FROM status_pembayaran
-    WHERE id_user = $id_user
-    ORDER BY tahun DESC, FIELD(bulan,'Januari','Februari','Maret','April','Mei','Juni','Juli',
-    'Agustus','September','Oktober','November','Desember')
+    SELECT bulan, tahun, jumlah, status, tanggal_bayar 
+    FROM status_pembayaran
+    WHERE id_users = '$id_user'
+    ORDER BY
+        tahun DESC,
+        FIELD(bulan,
+            'Januari','Februari','Maret','April','Mei','Juni','Juli',
+            'Agustus','September','Oktober','November','Desember'
+        )
 ");
 
+
+// Jika query gagal
+if (!$cek) {
+    die("SQL Error: " . mysqli_error($conn));
+}
 ?>
 
 <h2>Status Pembayaran Saya</h2>

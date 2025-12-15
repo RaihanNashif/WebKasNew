@@ -1,12 +1,15 @@
 <?php 
-include "../middleware/admin_only.php";
+include "../middleware/admin_superadmin.php";
 include "../partials/navbar.php";
+include "../status/generate_status.php";
 require "../config/koneksi.php";
 ?>
 
 <div class="container">
     <h2>Dashboard Admin</h2>
     <p>Halo <?= $_SESSION['nama']; ?>! Berikut ringkasan data:</p>
+    <a href="../laporan/laporan_admin.php" class="btn btn-primary">Lihat Laporan</a>
+
 
     <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:20px;">
 
@@ -40,13 +43,5 @@ require "../config/koneksi.php";
     </div>
 </div>
 
-<style>
-.card-box {
-    background:white;
-    padding:20px;
-    border-radius:8px;
-    width:200px;
-    text-align:center;
-    box-shadow:0 2px 4px rgba(0,0,0,.1);
-}
-</style>
+</main>
+</div>
