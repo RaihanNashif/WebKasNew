@@ -20,13 +20,6 @@ if (isset($_POST['simpan'])) {
     exit;
 }
 ?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Tambah Anggota</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-</head>
 
 <body class="bg-light">
 
@@ -61,10 +54,14 @@ if (isset($_POST['simpan'])) {
             <input name="no_hp" class="form-control">
         </div>
 
-        <button class="btn btn-primary" name="simpan">Simpan</button>
+        <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-primary" name="simpan">Simpan</button>
+            <a href="list_anggota.php" class="btn btn-link">Kembali</a>
+        </div>
+
+
 
     </form>
-
 </div>
 
 </body>

@@ -1,9 +1,8 @@
 <?php
-include "../middleware/superadmin_only.php";
+include "../middleware/admin_superadmin.php";
 include "../partials/navbar.php";
 require "../config/koneksi.php";
 
-// Ambil semua admin & superadmin
 $query = mysqli_query($conn, "
     SELECT * FROM users 
     WHERE role='admin' OR role='superadmin'
@@ -19,14 +18,11 @@ $query = mysqli_query($conn, "
 </head>
 
 <body class="bg-light">
-
 <div class="container py-4">
 
     <h3 class="mb-3">Kelola Admin</h3>
 
-    <a href="tambah_admin.php" class="btn btn-primary mb-3">
-        + Tambah Admin
-    </a>
+    <a href="tambah_admin.php" class="btn btn-primary mb-3">+ Tambah Admin</a>
 
     <table class="table table-bordered bg-white">
         <thead class="table-light">
@@ -49,15 +45,11 @@ $query = mysqli_query($conn, "
                 <td><?= htmlentities($row['role']); ?></td>
                 <td><?= htmlentities($row['no_hp']); ?></td>
                 <td>
-                    <a href="edit_admin.php?id=<?= $row['id_users']; ?>" class="btn btn-warning btn-sm">
-                        Edit
-                    </a>
+                    <a href="edit_admin.php?id=<?= $row['id_users']; ?>" class="btn btn-warning btn-sm">Edit</a>
                     <?php if ($row['role'] == 'admin'): ?>
                         <a href="hapus_admin.php?id=<?= $row['id_users']; ?>" 
                            onclick="return confirm('Yakin ingin menghapus admin ini?')" 
-                           class="btn btn-danger btn-sm">
-                            Hapus
-                        </a>
+                           class="btn btn-danger btn-sm">Hapus</a>
                     <?php endif; ?>
                 </td>
             </tr>

@@ -28,22 +28,21 @@ require "../config/koneksi.php";
     
     <button type="submit">Lihat</button>
 
-    <?php if (isset($_GET['bulan']) && isset($_GET['tahun'])): ?>
-        <a href="export_pdf.php?bulan=<?= $_GET['bulan']; ?>&tahun=<?= $_GET['tahun']; ?>" 
-           target="_blank"
-           style="margin-left:20px; padding:8px; background:green; color:white; text-decoration:none;">
-           Export PDF
-        </a>
-    <?php endif; ?>
 </form>
-
-<br><br>
 
 <?php
 if (isset($_GET['bulan']) && isset($_GET['tahun'])) {
 
     $bulan = $_GET['bulan'];
     $tahun = $_GET['tahun'];
+
+    // 🔹 mapping bulan Indonesia → angka
+    $bulanMap = [
+        'Januari'=>1,'Februari'=>2,'Maret'=>3,'April'=>4,'Mei'=>5,'Juni'=>6,
+        'Juli'=>7,'Agustus'=>8,'September'=>9,'Oktober'=>10,'November'=>11,'Desember'=>12
+    ];
+
+    $bulanAngka = $bulanMap[$bulan];
 
     // Ambil semua anggota
     $anggota = mysqli_query($conn, "
@@ -53,6 +52,7 @@ if (isset($_GET['bulan']) && isset($_GET['tahun'])) {
         ORDER BY nama ASC
     ") or die("Query anggota gagal: " . mysqli_error($conn));
 ?>
+
 <table border="1" cellpadding="10" cellspacing="0">
     <tr>
         <th>Nama Anggota</th>
@@ -61,30 +61,31 @@ if (isset($_GET['bulan']) && isset($_GET['tahun'])) {
         <th>Tanggal Bayar</th>
     </tr>
 
-    <?php while ($a = mysqli_fetch_assoc($anggota)) { 
+    <?php while ($a = mysqli_fetch_assoc($anggota)) {
 
-        // Ambil status pembayaran asli
         $cek = mysqli_query($conn, "
-            SELECT status, jumlah, tanggal_bayar 
-            FROM status_pembayaran 
-            WHERE id_users='{$a['id_users']}'
-            AND bulan='$bulan'
-            AND tahun='$tahun'
-            LIMIT 1
-        ") or die("Query status gagal: " . mysqli_error($conn));
+        SELECT 
+            SUM(jumlah) AS total,
+            MAX(tanggal) AS tanggal_bayar
+        FROM pemasukan
+        WHERE id_users='{$a['id_users']}'
+        AND MONTH(tanggal) = '$bulanAngka'
+        AND YEAR(tanggal) = '$tahun'
+        ");
 
-        if(mysqli_num_rows($cek) > 0){
-            $row = mysqli_fetch_assoc($cek);
-            $status = ($row['status'] === 'lunas') 
-                ? "<span style='color:green;font-weight:bold;'>LUNAS</span>"
-                : "<span style='color:red;font-weight:bold;'>BELUM</span>";
-            $jumlah = "Rp " . number_format($row['jumlah'], 0, ',', '.');
-            $tanggal = $row['tanggal_bayar'];
+
+        $row = mysqli_fetch_assoc($cek);
+
+        if ($row['total'] > 0) {
+            $status = "<span style='color:green;font-weight:bold;'>LUNAS</span>";
+            $jumlah = "Rp " . number_format($row['total'], 0, ',', '.');
+            $tanggal = date('d-m-Y', strtotime($row['tanggal_bayar']));
         } else {
             $status = "<span style='color:red;font-weight:bold;'>BELUM</span>";
             $jumlah = "Rp 0";
             $tanggal = "-";
         }
+
     ?>
 
     <tr>

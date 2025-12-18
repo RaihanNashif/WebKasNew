@@ -21,37 +21,38 @@ if(isset($_POST['simpan'])){
 
     ");
 
-    if($insert){
-        // Update status pembayaran jadi LUNAS
-        $bulan = date('n'); // angka bulan
+    if ($insert) {
+
+        $bulanAngka = date('n', strtotime($tanggal));
+        $tahun = date('Y', strtotime($tanggal));
+    
         $bulanArray = [
             1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',
             7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'
         ];
-        $bulanIndo = $bulanArray[$bulan];
-        $tahun = date('Y');
-
-        mysqli_query($conn, "
+        $bulanIndo = $bulanArray[$bulanAngka];
+    
+        // UPDATE dulu
+        $update = mysqli_query($conn, "
             UPDATE status_pembayaran
-            SET status='Lunas', tanggal_bayar=CURDATE()
-            WHERE id_users='$id_user' AND bulan='$bulanIndo' AND tahun='$tahun'
+            SET jumlah='$jumlah',
+                status='Lunas',
+                tanggal_bayar='$tanggal'
+            WHERE id_users='$id_user'
+              AND bulan='$bulanIndo'
+              AND tahun='$tahun'
         ");
-
-        // Jika belum ada → insert baru
-        if(mysqli_num_rows($cek) == 0){
+    
+        // kalau tidak ada yang ter-update → insert
+        if (mysqli_affected_rows($conn) == 0) {
             mysqli_query($conn, "
-                INSERT INTO status_pembayaran (id_users, bulan, tahun, jumlah, status, tanggal_bayar)
-                VALUES ('$id_user', '$bulan', '$tahun', '$jumlah', 'Lunas', '$tanggal')
-            ");
-        } 
-        // Jika sudah ada → update jadi LUNAS
-        else {
-            mysqli_query($conn, "
-                UPDATE status_pembayaran 
-                SET jumlah='$jumlah', status='Lunas', tanggal_bayar='$tanggal'
-                WHERE id_users='$id_user' AND bulan='$bulan' AND tahun='$tahun'
+                INSERT INTO status_pembayaran
+                (id_users, bulan, tahun, jumlah, status, tanggal_bayar)
+                VALUES
+                ('$id_user','$bulanIndo','$tahun','$jumlah','Lunas','$tanggal')
             ");
         }
+    
         header("Location: list_pemasukan.php");
         exit;
     } else {
@@ -61,6 +62,40 @@ if(isset($_POST['simpan'])){
 ?>
 
 <div class="container py-4">
+
+    <?php //Cek Generate Status
+        // ambil bulan & tahun sekarang
+        $bulanArray = [
+            1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',
+            7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'
+        ];
+
+        $bulanSekarang = $bulanArray[date('n')];
+        $tahunSekarang = date('Y');
+
+        // cek apakah status bulan ini sudah di-generate
+        $cekGenerate = mysqli_query($conn, "
+            SELECT 1 
+            FROM status_pembayaran 
+            WHERE bulan='$bulanSekarang' 
+            AND tahun='$tahunSekarang'
+            LIMIT 1
+        ");
+
+        $belumGenerate = (mysqli_num_rows($cekGenerate) == 0);
+    ?>
+
+    <?php if ($belumGenerate): ?>
+        <div class="alert alert-warning">
+            <b>Perhatian!</b><br>
+            Status pembayaran bulan
+            <b><?= $bulanSekarang ?> <?= $tahunSekarang ?></b>
+            belum di-generate.<br>
+            Silakan generate terlebih dahulu di menu
+            <b>Status Pembayaran</b>.
+        </div>
+    <?php endif; ?>
+
     <h2>Tambah Pemasukan</h2>
     <form method="POST">
         <div class="mb-3">

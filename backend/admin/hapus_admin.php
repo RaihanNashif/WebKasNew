@@ -12,7 +12,7 @@ if ($cek['role'] == 'superadmin') {
     die("Superadmin tidak bisa dihapus.");
 }
 
-mysqli_query($conn, "DELETE FROM users WHERE id_user='$id'");
+mysqli_query($conn, "DELETE FROM users WHERE id_users='$id'");
 
 header("Location: list_admin.php");
 exit;

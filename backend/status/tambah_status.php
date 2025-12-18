@@ -16,10 +16,52 @@ if (isset($_POST['simpan'])) {
     ");
 
     if ($insert) {
-        echo "<script>alert('Berhasil ditambahkan'); window.location='list_status.php';</script>";
-    } else {
-        echo "<script>alert('Gagal!');</script>";
-    }
+        if ($insert) {
+
+            // ambil bulan & tahun dari tanggal input
+            $bulanAngka = date('n', strtotime($tanggal));
+            $tahun = date('Y', strtotime($tanggal));
+        
+            $bulanArray = [
+                1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',5=>'Mei',6=>'Juni',
+                7=>'Juli',8=>'Agustus',9=>'September',10=>'Oktober',11=>'November',12=>'Desember'
+            ];
+            $bulanIndo = $bulanArray[$bulanAngka];
+        
+            // cek status pembayaran
+            $cek = mysqli_query($conn, "
+                SELECT id_status
+                FROM status_pembayaran
+                WHERE id_users='$id_user'
+                  AND bulan='$bulanIndo'
+                  AND tahun='$tahun'
+            ");
+        
+            if (mysqli_num_rows($cek) == 0) {
+                // belum ada → insert
+                mysqli_query($conn, "
+                    INSERT INTO status_pembayaran
+                    (id_users, bulan, tahun, jumlah, status, tanggal_bayar)
+                    VALUES
+                    ('$id_user', '$bulanIndo', '$tahun', '$jumlah', 'Lunas', '$tanggal')
+                ");
+            } else {
+                // sudah ada → update
+                mysqli_query($conn, "
+                    UPDATE status_pembayaran
+                    SET jumlah='$jumlah',
+                        status='Lunas',
+                        tanggal_bayar='$tanggal'
+                    WHERE id_users='$id_user'
+                      AND bulan='$bulanIndo'
+                      AND tahun='$tahun'
+                ");
+            }
+        
+            header("Location: list_pemasukan.php");
+            exit;
+        }
+    }        
 }
 ?>
 

@@ -3,70 +3,52 @@ include "../middleware/superadmin_only.php";
 include "../partials/navbar.php";
 require "../config/koneksi.php";
 
-// Ambil semua admin & superadmin
-$query = mysqli_query($conn, "
-    SELECT * FROM users 
-    WHERE role='admin' OR role='superadmin'
-    ORDER BY role DESC, nama ASC
-");
-?>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Kelola Admin</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-</head>
+if (isset($_POST['simpan'])) {
+    $nama     = mysqli_real_escape_string($conn, $_POST['nama']);
+    $username = mysqli_real_escape_string($conn, $_POST['username']);
+    $password = mysqli_real_escape_string($conn, $_POST['password']);
+    $no_hp    = mysqli_real_escape_string($conn, $_POST['no_hp']);
 
-<body class="bg-light">
+    mysqli_query($conn, "
+        INSERT INTO users (nama, username, password, role, no_hp)
+        VALUES ('$nama', '$username', '$password', 'admin', '$no_hp')
+    ");
+
+    header("Location: list_admin.php");
+    exit;
+}
+?>
 
 <div class="container py-4">
+    <h3 class="mb-3">Tambah Admin</h3>
 
-    <h3 class="mb-3">Kelola Admin</h3>
+    <form method="POST" class="bg-white p-4 rounded shadow-sm">
 
-    <a href="tambah_admin.php" class="btn btn-primary mb-3">
-        + Tambah Admin
-    </a>
+        <div class="mb-3">
+            <label class="form-label">Nama</label>
+            <input name="nama" class="form-control" required>
+        </div>
 
-    <table class="table table-bordered bg-white">
-        <thead class="table-light">
-            <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>Username</th>
-                <th>Role</th>
-                <th>No HP</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input name="username" class="form-control" required>
+        </div>
 
-        <tbody>
-        <?php $no = 1; while ($row = mysqli_fetch_assoc($query)): ?>
-            <tr>
-                <td><?= $no++; ?></td>
-                <td><?= htmlentities($row['nama']); ?></td>
-                <td><?= htmlentities($row['username']); ?></td>
-                <td><?= $row['role']; ?></td>
-                <td><?= htmlentities($row['no_hp']); ?></td>
-                <td>
-                    <a href="edit_admin.php?id=<?= $row['id_users']; ?>" class="btn btn-warning btn-sm">
-                        Edit
-                    </a>
-                    <?php if ($row['role'] == 'admin'): ?>
-                        <a href="hapus_admin.php?id=<?= $row['id_users']; ?>" 
-                           onclick="return confirm('Yakin ingin menghapus admin ini?')" 
-                           class="btn btn-danger btn-sm">
-                            Hapus
-                        </a>
-                    <?php endif; ?>
-                </td>
-            </tr>
-        <?php endwhile; ?>
-        </tbody>
+        <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input name="password" type="password" class="form-control" required>
+        </div>
 
-    </table>
+        <div class="mb-3">
+            <label class="form-label">No HP</label>
+            <input name="no_hp" class="form-control">
+        </div>
 
+        <button class="btn btn-primary" name="simpan">Simpan</button>
+        <a href="list_admin.php" class="btn btn-secondary">Kembali</a>
+
+    </form>
 </div>
 
-</body>
-</html>
+</main>
+</div>

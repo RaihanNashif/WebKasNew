@@ -45,6 +45,12 @@ if (isset($_GET['bulan']) && isset($_GET['tahun'])) {
         ORDER BY u.nama ASC
     ");
 ?>
+<a href="generate_status.php?bulan=<?= $bulan ?>&tahun=<?= $tahun ?>"
+   onclick="return confirm('Generate status bulan ini?')"
+   class="btn btn-primary">
+   Generate Status
+</a>
+
 <table border="1" cellpadding="10" cellspacing="0">
     <tr>
         <th>Nama Anggota</th>

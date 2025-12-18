@@ -1,5 +1,6 @@
 <?php
 session_start();
+include "../partials/navbar.php";
 require "../config/koneksi.php";
 
 // Cek login dan role
@@ -9,13 +10,36 @@ if (!isset($_SESSION['role']) || !in_array($_SESSION['role'], ['admin','superadm
     exit;
 }
 
-// Ambil data laporan semua user
+// Laporan = Hasil Hitung
 $query = mysqli_query($conn, "
-    SELECT l.*, u.nama 
-    FROM laporan l
-    LEFT JOIN users u ON l.id_users = u.id_users
-    ORDER BY l.periode DESC
-");
+    SELECT 
+        periode,
+        SUM(total_pemasukan) AS total_pemasukan,
+        SUM(total_pengeluaran) AS total_pengeluaran,
+        (SUM(total_pemasukan) - SUM(total_pengeluaran)) AS saldo_akhir
+    FROM (
+        SELECT 
+            DATE_FORMAT(tanggal, '%Y-%m') AS periode,
+            SUM(jumlah) AS total_pemasukan,
+            0 AS total_pengeluaran
+        FROM pemasukan
+        GROUP BY periode
+
+        UNION ALL
+
+        SELECT 
+            DATE_FORMAT(tanggal, '%Y-%m') AS periode,
+            0 AS total_pemasukan,
+            SUM(jumlah) AS total_pengeluaran
+        FROM pengeluaran
+        GROUP BY periode
+    ) t
+    GROUP BY periode
+    ORDER BY periode DESC
+    ");
+
+
+
 
 if (!$query) {
     die("Query Error: " . mysqli_error($conn));
@@ -31,33 +55,55 @@ if (!$query) {
 </head>
 <body class="bg-light">
 
-<div class="container py-4">
-    <h3 class="mb-3">Laporan Keuangan Semua User</h3>
-    <table class="table table-bordered bg-white">
-        <thead class="table-light">
-            <tr>
-                <th>No</th>
-                <th>Diinput Oleh</th>
-                <th>Total Pemasukan</th>
-                <th>Total Pengeluaran</th>
-                <th>Saldo Akhir</th>
-                <th>Periode</th>
-            </tr>
-        </thead>
-        <tbody>
-        <?php $no=1; while($row = mysqli_fetch_assoc($query)): ?>
-            <tr>
-                <td><?= $no++ ?></td>
-                <td><?= htmlentities($row['nama']) ?></td>
-                <td>Rp <?= number_format($row['total_pemasukan'],0,',','.') ?></td>
-                <td>Rp <?= number_format($row['total_pengeluaran'],0,',','.') ?></td>
-                <td>Rp <?= number_format($row['saldo_akhir'],0,',','.') ?></td>
-                <td><?= htmlentities($row['periode']) ?></td>
-            </tr>
-        <?php endwhile; ?>
-        </tbody>
-    </table>
+<div class="container py-5">
+
+    <h2 class="text-center text-primary fw-bold mb-4">
+        Laporan Keuangan Kas RT
+    </h2>
+
+    <div class="card shadow-sm rounded-4">
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-light">
+                        <tr class="text-center">
+                            <th>No</th>
+                            <th>Total Pemasukan</th>
+                            <th>Total Pengeluaran</th>
+                            <th>Saldo Akhir</th>
+                            <th>Periode</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php $no=1; while($row = mysqli_fetch_assoc($query)): ?>
+
+                        <?php
+                            $saldo = $row['total_pemasukan'] - $row['total_pengeluaran'];
+                        ?>
+
+                        <tr>
+                            <td class="text-center"><?= $no++ ?></td>
+                            <td>Rp <?= number_format($row['total_pemasukan'],0,',','.') ?></td>
+                            <td>Rp <?= number_format($row['total_pengeluaran'],0,',','.') ?></td>
+                            <td class="fw-semibold">
+                                Rp <?= number_format($saldo, 0, ',', '.') ?>
+                            </td>
+                            <td><?= htmlentities($row['periode']) ?></td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <a href="laporan_pdf.php" class="btn btn-primary">
+            Unduh Laporan (PDF)
+        </a>
+        </div>
+    </div>
+
 </div>
 
 </body>
+
 </html>

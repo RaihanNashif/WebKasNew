@@ -4,6 +4,7 @@ include "../partials/navbar.php";
 require "../config/koneksi.php";
 
 $id = $_GET['id'];
+
 $data = mysqli_query($conn, "SELECT * FROM users WHERE id_users='$id'");
 $user = mysqli_fetch_assoc($data);
 
@@ -33,7 +34,7 @@ if (isset($_POST['update'])) {
         role='$role',
         no_hp='$no_hp'
         $passQuery
-        WHERE id_user='$id'
+        WHERE id_users='$id'
     ");
 
     header("Location: list_admin.php");
@@ -42,7 +43,6 @@ if (isset($_POST['update'])) {
 ?>
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <title>Edit Admin</title>
