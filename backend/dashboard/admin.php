@@ -1,43 +1,49 @@
-<?php 
+<?php
 include "../middleware/admin_superadmin.php";
 include "../partials/navbar.php";
-include "../status/generate_status.php";
 require "../config/koneksi.php";
 ?>
 
 <div class="container">
     <h2>Dashboard Admin</h2>
-    <p>Halo <?= $_SESSION['nama']; ?>! Berikut ringkasan data:</p>
-    <a href="../laporan/laporan_admin.php" class="btn btn-primary">Lihat Laporan</a>
+    <p>Halo <?= htmlentities($_SESSION['nama']); ?>! Berikut ringkasan data:</p>
 
+    <div class="row">
 
-    <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:20px;">
-
-        <div class="card-box">
-            <?php
-            $q = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role='anggota'");
-            $d = mysqli_fetch_assoc($q);
-            ?>
-            <h3><?= $d['total']; ?></h3>
-            <p>Jumlah Anggota</p>
+        <!-- Jumlah Anggota -->
+        <div class="card">
+            <div class="card shadow-sm text-center p-3">
+                <?php
+                $q = mysqli_query($conn, "SELECT COUNT(*) AS total FROM users WHERE role='anggota'");
+                $d = mysqli_fetch_assoc($q);
+                ?>
+                <h3><?= $d['total']; ?></h3>
+                <p class="mb-0">Jumlah Anggota</p>
+            </div>
         </div>
 
-        <div class="card-box">
-            <?php
-            $q = mysqli_query($conn, "SELECT SUM(jumlah) AS total FROM pemasukan");
-            $d = mysqli_fetch_assoc($q);
-            ?>
-            <h3>Rp <?= number_format($d['total'] ?? 0, 0, ',', '.'); ?></h3>
-            <p>Total Pemasukan</p>
+        <!-- Total Pemasukan -->
+        <div class="card">
+            <div class="card shadow-sm text-center p-3">
+                <?php
+                $q = mysqli_query($conn, "SELECT SUM(jumlah) AS total FROM pemasukan");
+                $d = mysqli_fetch_assoc($q);
+                ?>
+                <h3>Rp <?= number_format($d['total'] ?? 0, 0, ',', '.'); ?></h3>
+                <p class="mb-0">Total Pemasukan</p>
+            </div>
         </div>
 
-        <div class="card-box">
-            <?php
-            $q = mysqli_query($conn, "SELECT SUM(jumlah) AS total FROM pengeluaran");
-            $d = mysqli_fetch_assoc($q);
-            ?>
-            <h3>Rp <?= number_format($d['total'] ?? 0, 0, ',', '.'); ?></h3>
-            <p>Total Pengeluaran</p>
+        <!-- Total Pengeluaran -->
+        <div class="card">
+            <div class="card shadow-sm text-center p-3">
+                <?php
+                $q = mysqli_query($conn, "SELECT SUM(jumlah) AS total FROM pengeluaran");
+                $d = mysqli_fetch_assoc($q);
+                ?>
+                <h3>Rp <?= number_format($d['total'] ?? 0, 0, ',', '.'); ?></h3>
+                <p class="mb-0">Total Pengeluaran</p>
+            </div>
         </div>
 
     </div>
