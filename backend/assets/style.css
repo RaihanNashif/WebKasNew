@@ -20,7 +20,7 @@ body {
 /* ===== SIDEBAR ===== */
 .sidebar {
     width: 240px;
-    background: #1e40af;
+    background: #1eaf66;
     color: white;
     padding: 20px;
     display: flex;
@@ -62,7 +62,7 @@ body {
 }
 
 .sidebar a:hover {
-    background: #2563eb;
+    background: #25eb50;
     color: #fff;
 }
 
@@ -208,7 +208,7 @@ form textarea {
 
 form button {
     margin-top: 18px;
-    background: #2563eb;
+    background: #25eb2f;
     border: none;
     padding: 10px 16px;
     border-radius: 6px;

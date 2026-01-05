@@ -2,9 +2,9 @@
 include "../middleware/admin_superadmin.php";
 require "../config/koneksi.php";
 
-$id = $_GET['id_pengeluaran'];
+$id = $_GET['id'];
 
-mysqli_query($conn, "DELETE FROM pengeluaran WHERE id_pengeluaran='$id'");
+$delete = mysqli_query($conn, "DELETE FROM pengeluaran WHERE id_pengeluaran='$id'");
 
 if (!$delete) {
     die("SQL Error: " . mysqli_error($conn));
